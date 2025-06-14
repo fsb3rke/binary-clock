@@ -29,14 +29,10 @@ int main(int argc, char* argv[]) {
         time_t now = time(NULL);
         struct tm *t = localtime(&now);
 
-        std::bitset<8> hBCD = toBCD(t->tm_hour);
-        std::bitset<8> mBCD = toBCD(t->tm_min);
-        std::bitset<8> sBCD = toBCD(t->tm_sec);
-
         std::vector<std::bitset<8>> timeBCD = {
-            hBCD,
-            mBCD,
-            sBCD
+            toBCD(t->tm_hour),
+            toBCD(t->tm_min),
+            toBCD(t->tm_sec)
         };
         std::vector<std::bitset<4>> digits;
 
