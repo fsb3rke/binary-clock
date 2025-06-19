@@ -6,6 +6,7 @@
 
 
 std::bitset<8> toBCD(unsigned int m);
+void waitMS(long ms);
 
 int main(int argc, char* argv[]) {
     int sv = 1;
@@ -27,16 +28,17 @@ int main(int argc, char* argv[]) {
         erase();
 
         time_t now = time(NULL);
-        struct tm *t = localtime(&now);
+        struct tm t;
+        if (localtime_r(&now, &t) == NULL) continue;
 
         std::vector<std::bitset<8>> timeBCD = {
-            toBCD(t->tm_hour),
-            toBCD(t->tm_min),
-            toBCD(t->tm_sec)
+            toBCD(t.tm_hour),
+            toBCD(t.tm_min),
+            toBCD(t.tm_sec)
         };
         std::vector<std::bitset<4>> digits;
 
-        for (auto& bcd : timeBCD) {
+        for (const auto& bcd : timeBCD) {
             unsigned val = bcd.to_ulong();
             digits.push_back(std::bitset<4>((val >> 4) & 0xF));
             digits.push_back(std::bitset<4>(val & 0xF));
@@ -56,7 +58,7 @@ int main(int argc, char* argv[]) {
             running = false;
         }
 
-        napms(1000);
+        waitMS(1000);
     }
 
     endwin();
@@ -65,4 +67,11 @@ int main(int argc, char* argv[]) {
 
 std::bitset<8> toBCD(unsigned int m) {
     return std::bitset<8>((((m / 10) & 0xF) << 4) | ((m % 10) & 0xF));
+}
+
+void waitMS(long ms) {
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000L;
+    nanosleep(&ts, NULL);
 }
